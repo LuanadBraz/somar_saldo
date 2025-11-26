@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8">
+    <title>Somar Saldo Cliente - Playbonds</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="page">
+    <div class="card">
+        <header class="card-header">
+            <img src="{{ url_for('static', filename='img/LogoPlay.png') }}"
+                 alt="Playbonds"
+                 class="logo">
+            <h1>Somar Saldo Cliente</h1>
+            <p class="subtitle">Upload do arquivo e cálculo automático do total em R$</p>
+        </header>
+
+        <form method="post" enctype="multipart/form-data" class="form-upload">
+            <label for="arquivo">Selecione o arquivo CSV:</label>
+            <input type="file" name="arquivo" id="arquivo" accept=".csv" required>
+            <button type="submit">Calcular</button>
+        </form>
+
+        {% if erro %}
+            <div class="alert error">
+                {{ erro }}
+            </div>
+        {% endif %}
+
+        {% if total_formatado %}
+            <div class="result">
+                <div class="result-line">
+                    <span class="label">Data do processamento:</span>
+                    <span class="value">{{ data_hoje }}</span>
+                </div>
+                <div class="result-line">
+                    <span class="label">Saldo Cliente:</span>
+                    <span class="value highlight">{{ total_formatado }}</span>
+                </div>
+                <p class="hint">Desenvolvido by: <strong>Playbonds 2025</strong></p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</body>
+</html>
