@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template
-import pandas as pd
 from datetime import datetime
+import csv
+import io
 
 app = Flask(__name__)
 
@@ -26,24 +27,36 @@ def index():
                 erro = "Nenhum arquivo selecionado."
             else:
                 try:
-                    # Lê o CSV enviado (em memória)
-                    df = pd.read_csv(file)
+                    # Lê o arquivo enviado como texto
+                    stream = io.TextIOWrapper(file.stream, encoding="utf-8", errors="ignore")
 
-                    # Normaliza nomes das colunas para minúsculo
-                    colunas_lower = {c.lower(): c for c in df.columns}
+                    # Usa DictReader para ler por nome de coluna
+                    reader = csv.DictReader(stream)
 
-                    if "saldo" not in colunas_lower:
+                    # Normaliza nomes de coluna para minúsculo
+                    fieldnames_lower = {name.lower(): name for name in reader.fieldnames}
+
+                    if "saldo" not in fieldnames_lower:
                         erro = "A coluna 'Saldo' não foi encontrada no CSV. Verifique o cabeçalho."
                     else:
-                        col_saldo = colunas_lower["saldo"]
+                        col_saldo = fieldnames_lower["saldo"]
 
-                        # Converte para número (se já estiver como 0.26, 10.50 etc)
-                        df[col_saldo] = df[col_saldo].astype(float)
+                        total = 0.0
+                        for row in reader:
+                            valor_str = row.get(col_saldo, "").strip()
 
-                        # Soma
-                        total = df[col_saldo].sum()
+                            if not valor_str:
+                                continue
 
-                        # Formata em R$
+                            # Aceita "1234.56" ou "1234,56"
+                            valor_str = valor_str.replace(".", "").replace(",", ".") if "," in valor_str else valor_str
+                            try:
+                                valor = float(valor_str)
+                                total += valor
+                            except ValueError:
+                                # ignora linhas com valores inválidos
+                                continue
+
                         total_formatado = formatar_brl(total)
 
                 except Exception as e:
@@ -58,5 +71,4 @@ def index():
 
 
 if __name__ == "__main__":
-    # Para rodar localmente
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
