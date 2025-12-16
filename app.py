@@ -15,6 +15,7 @@ def formatar_brl(valor: float) -> str:
 def index():
     erro = None
     total_formatado = None
+    qtd_linhas = None  #AQUI ONDE ALTEREI PARA DELETAR A LINHA SE FOR PRECISO
     data_hoje = datetime.now().strftime("%d/%m/%Y")
 
     if request.method == "POST":
@@ -42,6 +43,7 @@ def index():
                         col_saldo = fieldnames_lower["saldo"]
 
                         total = 0.0
+                        contador = 0  #TAMBÉM A LINHA SE DER ERRADO PARA DELETAR
                         for row in reader:
                             valor_str = row.get(col_saldo, "").strip()
 
@@ -53,11 +55,13 @@ def index():
                             try:
                                 valor = float(valor_str)
                                 total += valor
+                                contador += 1  #CASO DE RUIM DELETAR ESSA LINHA TBM
                             except ValueError:
                                 # ignora linhas com valores inválidos
                                 continue
 
                         total_formatado = formatar_brl(total)
+                        qtd_linhas = contador  #OUTRA LINHA CASO DER RUIM PARA DELETAR
 
                 except Exception as e:
                     erro = f"Erro ao processar o arquivo: {e}"
@@ -66,9 +70,11 @@ def index():
         "index.html",
         erro=erro,
         total_formatado=total_formatado,
+        qtd_linhas=qtd_linhas,  #AQUI TBMM DELETAR PARA FUNCIONALIDADE DO SERVIÇO
         data_hoje=data_hoje,
     )
 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
+
