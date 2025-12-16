@@ -38,6 +38,15 @@
                     <span class="label">Saldo Cliente:</span>
                     <span class="value highlight">{{ total_formatado }}</span>
                 </div>
+
+                   <!--AQUI ONDE ADICIONEI O COD PRA DELETAR CASO PRECISE -->
+        {% if qtd_linhas is not none %}
+            <div class="result-line">
+                <span class="label">Qtd. de linhas:</span>
+                <span class="value">{{ qtd_linhas }}</span>
+            </div>
+        {% endif %}
+        <!--ATÉ AQUI - AQUI ONDE ADICIONEI O COD PRA DELETAR CASO PRECISE -->
                 <p class="hint">Desenvolvido by: <strong>Playbonds 2025</strong></p>
             </div>
         {% endif %}
@@ -45,3 +54,4 @@
 </div>
 </body>
 </html>
+
